@@ -1,57 +1,91 @@
-const n = 10;
-const array=[];
-init();//generate first array and show the bars on program startup
-function init(){
-	for(let i = 0; i<n;i++){
-		array[i]=Math.random();
-	}
-	showBars();
-}
-function play(){
-	const copy=[...array];
-	const swaps = bubbleSort(copy);
-	animate(swaps);
-}
-function animate(swaps){
-	if(swaps.length==0){
-		showBars();
-		return;
-	}
-	const [i,j] = swaps.shift();
-	[array[i],array[j]]=[array[j],array[i]];
-	showBars([i,j]);
-	setTimeout(function(){
-		animate(swaps);
-	},50);
+const container = document.getElementById('container');
+let n = 20;
+let array = [];
+let isSorting = false;
+let timeoutID = null;
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    init(); // Generate first array and show the bars on program startup
+});
+
+function updateArraySize(value) {
+    stopSorting();
+    n = value;
+    document.getElementById('arraysize-value').innerText = value;
+    init();
 }
 
-//bubble sort
-function bubbleSort(array)
-{
-	const swaps=[];
-	do{
-		var swapped = false;
-		for(let i = 1; i<array.length;i++){
-			if(array[i-1] > array[i]){
-				swapped = true;
-				swaps.push([i-1,i]);
-				[array[i-1],array[i]]=[array[i],array[i-1]];
-			}	
-		}
-	}while(swapped);
-	return swaps;
+function init() {
+    stopSorting();
+    array = [];
+    for (let i = 0; i < n; i++) {
+        array[i] = Math.random();
+    }
+    showBars();
 }
-function showBars(indicies){
-	container.innerHTML="";
-	for(let i = 0;i<array.length;i++){
-		const bar = document.createElement("div");
-		bar.style.height=array[i]*100+"%";
-		bar.classList.add("bar");
-		if(indicies && indicies.includes(i))
-		{
-			
-			bar.style.backgroundColor="red";
-		}
-		container.appendChild(bar);
-	}
+
+function play() {
+    if (isSorting) {
+        stopSorting();
+        init();
+    }
+    isSorting = true;
+    const copy = [...array];
+    const moves = bubbleSort(copy);
+    animate(moves);
+}
+
+function stopSorting() {
+    isSorting = false;
+    if (timeoutID) {
+        clearTimeout(timeoutID);
+        timeoutID = null;
+    }
+}
+
+function animate(moves) {
+    if (moves.length === 0 || !isSorting) {
+        showBars();
+        isSorting = false;
+        return;
+    }
+    const move = moves.shift();
+    const [i, j] = move.indicies;
+
+    if (move.type === "swap") {
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    showBars(move);
+    timeoutID = setTimeout(function () {
+        animate(moves);
+    }, 150);
+}
+
+function bubbleSort(array) {
+    const moves = [];
+    do {
+        var swapped = false;
+        for (let i = 1; i < array.length; i++) {
+            moves.push({indicies: [i - 1, i], type: "comp"});
+            if (array[i - 1] > array[i]) {
+                swapped = true;
+                moves.push({indicies: [i - 1, i], type: "swap"});
+                [array[i - 1], array[i]] = [array[i], array[i - 1]];
+            }
+        }
+    } while (swapped);
+    return moves;
+}
+
+function showBars(move) {
+    container.innerHTML = "";
+    for (let i = 0; i < array.length; i++) {
+        const bar = document.createElement("div");
+        bar.style.height = array[i] * 100 + "%";
+        bar.classList.add("bar");
+        if (move && move.indicies.includes(i)) {
+            bar.style.backgroundColor = move.type === "swap" ? "red" : "blue";
+        }
+        container.appendChild(bar);
+    }
 }
