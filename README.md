@@ -14,8 +14,8 @@ This project is meant to showcase visualizations for some of the most common sor
 ## Sorting Algorithms Implemented
 
 - Bubble Sort
-- Insertion Sort(to be implemented)
-- Selection Sort(to be implemented)
+- Insertion Sort
+- Selection Sort
 - Merge Sort(to be implemented)
 - Quick Sort(to be implemented)
 
