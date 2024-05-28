@@ -16,7 +16,7 @@ This project is meant to showcase visualizations for some of the most common sor
 - Bubble Sort
 - Insertion Sort
 - Selection Sort
-- Merge Sort(to be implemented)
+- Merge Sort
 - Quick Sort(to be implemented)
 
 ## License
