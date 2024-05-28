@@ -14,11 +14,12 @@ function play(){
 }
 function animate(swaps){
 	if(swaps.length==0){
+		showBars();
 		return;
 	}
 	const [i,j] = swaps.shift();
 	[array[i],array[j]]=[array[j],array[i]];
-	showBars();
+	showBars([i,j]);
 	setTimeout(function(){
 		animate(swaps);
 	},50);
@@ -40,12 +41,17 @@ function bubbleSort(array)
 	}while(swapped);
 	return swaps;
 }
-function showBars(){
+function showBars(indicies){
 	container.innerHTML="";
 	for(let i = 0;i<array.length;i++){
 		const bar = document.createElement("div");
 		bar.style.height=array[i]*100+"%";
 		bar.classList.add("bar");
+		if(indicies && indicies.includes(i))
+		{
+			
+			bar.style.backgroundColor="red";
+		}
 		container.appendChild(bar);
 	}
 }
