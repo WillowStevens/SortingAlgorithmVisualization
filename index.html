@@ -9,18 +9,26 @@
 <body>
     <h1>Sorting Algorithm Visualization</h1>
     <div id="container"></div>
-    
+
     <hr>
     <div>
         <label for="arraysize">Array Size:</label>
         <input type="range" id="arraysize" name="arraysize" min="10" max="100" value="20" oninput="updateArraySize(this.value)">
         <span id="arraysize-value">20</span>
-        <button onclick="randomizeArray()">Randomize Array</button>
-        <button onclick="play(bubbleSort)">Bubble Sort</button>
-	<button onclick="play(insertionSort)">Insertion Sort</button>
-	<button onclick="play(selectionSort)">Selection Sort</button>
-	<button id="pauseResumeButton" onclick ="pauseResume()">Pause</button>
     </div>
+    <div>
+        <label for="speed">Sorting Speed:</label>
+        <input type="range" id="speed" name="speed" min="50" max="1000" value="150" oninput="updateSpeed(this.value)">
+        <span id="speed-value">150 ms</span>
+    </div>
+    <div>
+        <button onclick="init()">Randomize List</button>
+        <button onclick="play(bubbleSort)">Bubble Sort</button>
+        <button onclick="play(insertionSort)">Insertion Sort</button>
+        <button onclick="play(selectionSort)">Selection Sort</button>
+        <button id="pauseResumeButton" onclick="pauseResume()">Pause</button>
+    </div>
+    <div id="description"></div>
     <script src="script.js"></script>
 </body>
 </html>
