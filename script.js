@@ -7,8 +7,9 @@ let isPaused = false;
 let timeoutID = null;
 let remainingMoves = [];
 let speed = 150;
+let sortedIndices = new Set();
 
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
     randomizeArray(); // Generate first array and show the bars on program startup
 });
 
@@ -21,12 +22,13 @@ function updateArraySize(value) {
 
 function updateSpeed(value) {
     speed = value;
-    document.getElementById('speed-value').innerText = `${value} ms`;
+    document.getElementById('speed-value').innerText = '${value} ms';
 }
 
 function randomizeArray() {
     stopSorting();
     array = [];
+    sortedIndices.clear();
     for (let i = 0; i < n; i++) {
         array[i] = Math.random();
     }
@@ -56,6 +58,7 @@ function stopSorting() {
         timeoutID = null;
     }
     remainingMoves = [];
+    sortedIndices.clear();
     document.getElementById('pauseResumeButton').innerText = 'Pause';
 }
 
@@ -76,28 +79,34 @@ function pauseResume() {
 
 function animate() {
     if (remainingMoves.length === 0 || !isSorting) {
-        showBars();
+        showBars(null, true);
         isSorting = false;
         return;
     }
     if (isPaused) return;
     const move = remainingMoves.shift();
-    const [i, j] = move.indices;
+    if (move.indices) {
+        const [i, j] = move.indices;
 
-    if (move.type === "swap") {
-        [array[i], array[j]] = [array[j], array[i]];
+        if (move.type === "swap") {
+            [array[i], array[j]] = [array[j], array[i]];
+        }
     }
+
+    if (move.sortedIndex !== undefined) {
+        sortedIndices.add(move.sortedIndex);
+    }
+
     showBars(move);
     timeoutID = setTimeout(animate, speed);
 }
 
 function bubbleSort(array) {
     const moves = [];
-    let swapped;
-	let counter = 0;
+    let sortedIndex = array.length;
     do {
-        swapped = false;
-        for (let i = 0; i < array.length - 1 - counter; i++) {
+        let swapped = false;
+        for (let i = 0; i < sortedIndex - 1; i++) {
             moves.push({indices: [i, i + 1], type: "comp"});
             if (array[i] > array[i + 1]) {
                 [array[i], array[i + 1]] = [array[i + 1], array[i]];
@@ -105,19 +114,26 @@ function bubbleSort(array) {
                 swapped = true;
             }
         }
-		counter++;
-    } while (swapped);
+        sortedIndex--;
+        if (!swapped) {
+            break;
+        }
+        moves.push({sortedIndex: sortedIndex});
+    } while (sortedIndex > 0);
     return moves;
 }
 
 function insertionSort(array) {
     const moves = [];
     for (let i = 1; i < array.length; i++) {
-        for (let j = i; j > 0 && array[j] < array[j - 1]; j--) {
+        let j = i;
+        while (j > 0 && array[j] < array[j - 1]) {
             moves.push({indices: [j, j - 1], type: "comp"});
             [array[j], array[j - 1]] = [array[j - 1], array[j]];
             moves.push({indices: [j, j - 1], type: "swap"});
+            j--;
         }
+        moves.push({sortedIndex: i});
     }
     return moves;
 }
@@ -136,17 +152,20 @@ function selectionSort(array) {
             [array[i], array[minIndex]] = [array[minIndex], array[i]];
             moves.push({indices: [i, minIndex], type: "swap"});
         }
+        moves.push({sortedIndex: i});
     }
     return moves;
 }
 
-function showBars(move) {
+function showBars(move, sorted = false) {
     container.innerHTML = "";
     for (let i = 0; i < array.length; i++) {
         const bar = document.createElement("div");
         bar.style.height = array[i] * 100 + "%";
         bar.classList.add("bar");
-        if (move && move.indices.includes(i)) {
+        if (sorted || sortedIndices.has(i)) {
+            bar.classList.add("sorted");
+        } else if (move && move.indices && move.indices.includes(i)) {
             bar.classList.add(move.type === "swap" ? "swapping" : "comparing");
         }
         container.appendChild(bar);
