@@ -16,7 +16,8 @@
         <input type="range" id="arraysize" name="arraysize" min="10" max="100" value="20" oninput="updateArraySize(this.value)">
         <span id="arraysize-value">20</span>
         <button onclick="randomizeArray()">Randomize Array</button>
-        <button onclick="play()">Bubble Sort</button>
+        <button onclick="play(bubbleSort)">Bubble Sort</button>
+		<button onclick="play(insertionSort)">Insertion Sort</button>
 		<button id="pauseResumeButton" onclick ="pauseResume()">Pause</button>
     </div>
     <script src="script.js"></script>
