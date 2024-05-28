@@ -26,7 +26,7 @@ function randomizeArray() {
     showBars();
 }
 
-function play() {
+function play(sortFunction) {
     if (isSorting) {
         stopSorting();
         randomizeArray();
@@ -35,7 +35,7 @@ function play() {
     isPaused = false;
     document.getElementById('pauseResumeButton').innerText = 'Pause';
     const copy = [...array];
-    const moves = bubbleSort(copy);
+    const moves = sortFunction(copy);
     remainingMoves = moves;
     animate();
 }
@@ -97,6 +97,17 @@ function bubbleSort(array) {
             }
         }
     } while (swapped);
+    return moves;
+}
+function insertionSort(array) {
+    const moves = [];
+    for (let i = 1; i < array.length; i++) {
+        for (let j = i; j > 0 && array[j] < array[j - 1]; j--) {
+            moves.push({indices: [j, j - 1], type: "comp"});
+            [array[j], array[j - 1]] = [array[j - 1], array[j]];
+            moves.push({indices: [j, j - 1], type: "swap"});
+        }
+    }
     return moves;
 }
 
