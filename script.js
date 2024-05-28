@@ -94,9 +94,10 @@ function animate() {
 function bubbleSort(array) {
     const moves = [];
     let swapped;
+	let counter = 0;
     do {
         swapped = false;
-        for (let i = 0; i < array.length - 1; i++) {
+        for (let i = 0; i < array.length - 1 - counter; i++) {
             moves.push({indices: [i, i + 1], type: "comp"});
             if (array[i] > array[i + 1]) {
                 [array[i], array[i + 1]] = [array[i + 1], array[i]];
@@ -104,6 +105,7 @@ function bubbleSort(array) {
                 swapped = true;
             }
         }
+		counter++;
     } while (swapped);
     return moves;
 }
