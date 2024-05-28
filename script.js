@@ -1,6 +1,4 @@
-// script.js
 const container = document.getElementById('container');
-const description = document.getElementById('description');
 const algorithmInfo = document.getElementById('algorithm-info');
 let n = 20;
 let array = [];
@@ -10,6 +8,7 @@ let timeoutID = null;
 let remainingMoves = [];
 let speed = 50;
 let sortedIndices = new Set();
+let currentPivotIndex = null; // Add this line to track the current pivot index
 
 document.addEventListener('DOMContentLoaded', () => {
     randomizeArray();
@@ -32,6 +31,7 @@ function randomizeArray() {
     stopSorting();
     array = [];
     sortedIndices.clear();
+    currentPivotIndex = null; // Reset the pivot index when randomizing the array
     for (let i = 0; i < n; i++) {
         array[i] = Math.random();
     }
@@ -51,7 +51,8 @@ function getSortFunction(name) {
         case 'bubbleSort': return bubbleSort;
         case 'insertionSort': return insertionSort;
         case 'selectionSort': return selectionSort;
-		case 'mergeSort': return mergeSort;
+        case 'mergeSort': return mergeSort;
+        case 'quickSort': return quickSort;
         default: return null;
     }
 }
@@ -79,6 +80,7 @@ function stopSorting() {
     }
     remainingMoves = [];
     sortedIndices.clear();
+    currentPivotIndex = null; // Reset the pivot index when stopping the sorting
     document.getElementById('pauseResumeButton').innerText = 'Pause';
 }
 
@@ -104,6 +106,7 @@ function step() {
         return;
     }
     const move = remainingMoves.shift();
+    console.log("Processing move:", move);
     if (move.indices) {
         const [i, j] = move.indices;
 
@@ -116,6 +119,10 @@ function step() {
 
     if (move.sortedIndex !== undefined) {
         sortedIndices.add(move.sortedIndex);
+    }
+
+    if (move.type === "pivot") {
+        currentPivotIndex = move.index; // Update the current pivot index
     }
 
     showBars(move);
@@ -187,6 +194,7 @@ function selectionSort(array) {
     }
     return moves;
 }
+
 function mergeSort(array) {
     const moves = [];
     if (array.length <= 1) return moves;
@@ -205,14 +213,14 @@ function mergeSort(array) {
         const result = [];
 
         while (i < left.length && j < right.length) {
-            moves.push({ indices: [start + k, start + left.length + j], type: "comp" });
+            moves.push({ indices: [start + k, start + left.length + j], type: "comp" }); //track comparison
             if (left[i] < right[j]) {
                 result.push(left[i]);
-                moves.push({ indices: [start + k], value: left[i], type: "place" });
+                moves.push({ indices: [start + k], value: left[i], type: "place" }); //track placement
                 i++;
             } else {
                 result.push(right[j]);
-                moves.push({ indices: [start + k], value: right[j], type: "place" });
+                moves.push({ indices: [start + k], value: right[j], type: "place" }); //track placement
                 j++;
             }
             k++;
@@ -220,14 +228,14 @@ function mergeSort(array) {
 
         while (i < left.length) {
             result.push(left[i]);
-            moves.push({ indices: [start + k], value: left[i], type: "place" });
+            moves.push({ indices: [start + k], value: left[i], type: "place" }); //track placement
             i++;
             k++;
         }
 
         while (j < right.length) {
             result.push(right[j]);
-            moves.push({ indices: [start + k], value: right[j], type: "place" });
+            moves.push({ indices: [start + k], value: right[j], type: "place" }); //track placement
             j++;
             k++;
         }
@@ -244,6 +252,37 @@ function mergeSort(array) {
     return moves;
 }
 
+function quickSort(array) {
+    const moves = [];
+    quickSortHelper(array, 0, array.length - 1, moves);
+    return moves;
+
+    function quickSortHelper(array, low, high, moves) {
+        if (low < high) {
+            const pivotIndex = partition(array, low, high, moves);
+			currentPivotIndex = pivotIndex
+            moves.push({ index: pivotIndex, type: "pivot" }); // Track pivot placement
+            quickSortHelper(array, low, pivotIndex - 1, moves);
+            quickSortHelper(array, pivotIndex + 1, high, moves);
+        }
+    }
+
+    function partition(array, low, high, moves) {
+        const pivot = array[high];
+        let i = low - 1;
+        for (let j = low; j < high; j++) {
+            moves.push({ indices: [j, high], type: "comp" }); // Track comparison
+            if (array[j] < pivot) {
+                i++;
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+                moves.push({ indices: [i, j], type: "swap" }); // Track swap
+            }
+        }
+        [array[i + 1], array[high]] = [array[high], array[i + 1]]; // Swap pivot into place
+        moves.push({ indices: [i + 1, high], type: "swap" }); // Track swap
+        return i + 1;
+    }
+}
 
 function showBars(move, sorted = false) {
     container.innerHTML = "";
@@ -262,23 +301,28 @@ function showBars(move, sorted = false) {
                 bar.classList.add("placing");
             }
         }
+        if (currentPivotIndex !== null && currentPivotIndex === i) {
+            bar.classList.add("pivoting");
+        }
         container.appendChild(bar);
     }
 }
 
 function getDescription(sortFunction) {
     switch (sortFunction) {
-        case bubbleSort:
-            return "Bubble Sort: Repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.";
-        case insertionSort:
-            return "Insertion Sort: Builds the final sorted array one item at a time, inserting elements into their correct position.";
-        case selectionSort:
-            return "Selection Sort: Repeatedly finds the minimum element from the unsorted part and puts it at the beginning.";
-		case mergeSort:
-			return "Merge Sort: Repeatedly breaks the list down to smaller lists until there is only 1 element, then merges the lists." 
-        default:
-            return "";
-    }
+    case bubbleSort:
+        return "Bubble Sort: Repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.\n Best: O(n), Average: O(n^2), Worst: O(n^2), Space: O(1)";
+    case insertionSort:
+        return "Insertion Sort: Builds the final sorted array one item at a time, inserting elements into their correct position.\n Best: O(n), Average: O(n^2), Worst: O(n^2), Space: O(1)";
+    case selectionSort:
+        return "Selection Sort: Repeatedly finds the minimum element from the unsorted part and puts it at the beginning.\n Best: O(n^2), Average: O(n^2), Worst: O(n^2), Space: O(1)";
+    case mergeSort:
+        return "Merge Sort: Repeatedly breaks the list down to smaller lists until there is only 1 element, then merges the lists.\n Best: O(n log n), Average: O(n log n), Worst: O(n log n), Space: O(n)";
+    case quickSort:
+        return "Quick Sort: Divides the list into smaller sub-lists based on a pivot element, then sorts the sub-lists.\n Best: O(n log n), Average: O(n log n), Worst: O(n^2), Space: O(log n)";
+    default:
+        return "";
+}
 }
 
 function updateAlgorithmInfo() {
