@@ -7,14 +7,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<h1>Sorting Algorithm Visualization</h1>
+    <h1>Sorting Algorithm Visualization</h1>
     <div id="container"></div>
-	
-	<hr>
-	<div>
-		<button onClick="init()">Randomize List</button>
-		<button onClick="play()">Bubble Sort</button>
-	</div>
+    
+    <hr>
+    <div>
+        <label for="arraysize">Array Size:</label>
+        <input type="range" id="arraysize" name="arraysize" min="10" max="100" value="20" oninput="updateArraySize(this.value)">
+        <span id="arraysize-value">20</span>
+        <button onclick="init()">Randomize List</button>
+        <button onclick="play()">Bubble Sort</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
