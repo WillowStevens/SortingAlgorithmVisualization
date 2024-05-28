@@ -1,16 +1,19 @@
+// script.js
 const container = document.getElementById('container');
 const description = document.getElementById('description');
+const algorithmInfo = document.getElementById('algorithm-info');
 let n = 20;
 let array = [];
 let isSorting = false;
 let isPaused = false;
 let timeoutID = null;
 let remainingMoves = [];
-let speed = 150;
+let speed = 50;
 let sortedIndices = new Set();
 
 document.addEventListener('DOMContentLoaded', () => {
-    randomizeArray(); // Generate first array and show the bars on program startup
+    randomizeArray();
+    updateAlgorithmInfo();
 });
 
 function updateArraySize(value) {
@@ -22,7 +25,7 @@ function updateArraySize(value) {
 
 function updateSpeed(value) {
     speed = value;
-    document.getElementById('speed-value').innerText = '${value} ms';
+    document.getElementById('speed-value').innerText = `${value} ms`;
 }
 
 function randomizeArray() {
@@ -35,6 +38,23 @@ function randomizeArray() {
     showBars();
 }
 
+function playSelectedAlgorithm() {
+    const algorithm = document.getElementById('algorithm').value;
+    const sortFunction = getSortFunction(algorithm);
+    if (sortFunction) {
+        play(sortFunction);
+    }
+}
+
+function getSortFunction(name) {
+    switch (name) {
+        case 'bubbleSort': return bubbleSort;
+        case 'insertionSort': return insertionSort;
+        case 'selectionSort': return selectionSort;
+        default: return null;
+    }
+}
+
 function play(sortFunction) {
     if (isSorting) {
         stopSorting();
@@ -43,7 +63,6 @@ function play(sortFunction) {
     isSorting = true;
     isPaused = false;
     document.getElementById('pauseResumeButton').innerText = 'Pause';
-    description.innerText = getDescription(sortFunction);
     const copy = [...array];
     const moves = sortFunction(copy);
     remainingMoves = moves;
@@ -77,13 +96,12 @@ function pauseResume() {
     }
 }
 
-function animate() {
+function step() {
     if (remainingMoves.length === 0 || !isSorting) {
         showBars(null, true);
         isSorting = false;
         return;
     }
-    if (isPaused) return;
     const move = remainingMoves.shift();
     if (move.indices) {
         const [i, j] = move.indices;
@@ -98,6 +116,16 @@ function animate() {
     }
 
     showBars(move);
+}
+
+function animate() {
+    if (remainingMoves.length === 0 || !isSorting) {
+        showBars(null, true);
+        isSorting = false;
+        return;
+    }
+    if (isPaused) return;
+    step();
     timeoutID = setTimeout(animate, speed);
 }
 
@@ -184,3 +212,10 @@ function getDescription(sortFunction) {
             return "";
     }
 }
+
+function updateAlgorithmInfo() {
+    const algorithm = document.getElementById('algorithm').value;
+    algorithmInfo.innerText = getDescription(getSortFunction(algorithm));
+}
+
+document.getElementById('algorithm').addEventListener('change', updateAlgorithmInfo);
