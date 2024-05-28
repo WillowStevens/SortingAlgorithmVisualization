@@ -14,10 +14,12 @@ This project is meant to showcase visualizations for some of the most common sor
 ## Sorting Algorithms Implemented
 
 - Bubble Sort
+- Cocktail Sort(to be implemented)
 - Insertion Sort
 - Selection Sort
 - Merge Sort
-- Quick Sort(to be implemented)
+- Quick Sort
+- Heap Sort(to be implemented)
 
 ## License
 
