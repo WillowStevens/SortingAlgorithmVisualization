@@ -34,9 +34,12 @@ body {
     background-color: red !important;
 }
 
-.sorted {
-    background-color: green !important;
-}
 .placing {
     background-color: yellow !important;
+}
+.pivoting {
+    background-color: yellow !important;
+}
+.sorted {
+    background-color: green !important;
 }
