@@ -51,6 +51,7 @@ function getSortFunction(name) {
         case 'bubbleSort': return bubbleSort;
         case 'insertionSort': return insertionSort;
         case 'selectionSort': return selectionSort;
+		case 'mergeSort': return mergeSort;
         default: return null;
     }
 }
@@ -108,6 +109,8 @@ function step() {
 
         if (move.type === "swap") {
             [array[i], array[j]] = [array[j], array[i]];
+        } else if (move.type === "place") {
+            array[i] = move.value;
         }
     }
 
@@ -184,6 +187,63 @@ function selectionSort(array) {
     }
     return moves;
 }
+function mergeSort(array) {
+    const moves = [];
+    if (array.length <= 1) return moves;
+
+    function mergeSortHelper(array, start) {
+        if (array.length <= 1) return array;
+        const mid = Math.floor(array.length / 2);
+        const left = mergeSortHelper(array.slice(0, mid), start);
+        const right = mergeSortHelper(array.slice(mid), start + mid);
+
+        return merge(left, right, start);
+    }
+
+    function merge(left, right, start) {
+        let i = 0, j = 0, k = 0;
+        const result = [];
+
+        while (i < left.length && j < right.length) {
+            moves.push({ indices: [start + k, start + left.length + j], type: "comp" });
+            if (left[i] < right[j]) {
+                result.push(left[i]);
+                moves.push({ indices: [start + k], value: left[i], type: "place" });
+                i++;
+            } else {
+                result.push(right[j]);
+                moves.push({ indices: [start + k], value: right[j], type: "place" });
+                j++;
+            }
+            k++;
+        }
+
+        while (i < left.length) {
+            result.push(left[i]);
+            moves.push({ indices: [start + k], value: left[i], type: "place" });
+            i++;
+            k++;
+        }
+
+        while (j < right.length) {
+            result.push(right[j]);
+            moves.push({ indices: [start + k], value: right[j], type: "place" });
+            j++;
+            k++;
+        }
+
+        // Update the original array with sorted values
+        for (let m = 0; m < result.length; m++) {
+            array[start + m] = result[m];
+        }
+
+        return result;
+    }
+
+    mergeSortHelper(array, 0);
+    return moves;
+}
+
 
 function showBars(move, sorted = false) {
     container.innerHTML = "";
@@ -194,7 +254,13 @@ function showBars(move, sorted = false) {
         if (sorted || sortedIndices.has(i)) {
             bar.classList.add("sorted");
         } else if (move && move.indices && move.indices.includes(i)) {
-            bar.classList.add(move.type === "swap" ? "swapping" : "comparing");
+            if (move.type === "swap") {
+                bar.classList.add("swapping");
+            } else if (move.type === "comp") {
+                bar.classList.add("comparing");
+            } else if (move.type === "place") {
+                bar.classList.add("placing");
+            }
         }
         container.appendChild(bar);
     }
@@ -208,6 +274,8 @@ function getDescription(sortFunction) {
             return "Insertion Sort: Builds the final sorted array one item at a time, inserting elements into their correct position.";
         case selectionSort:
             return "Selection Sort: Repeatedly finds the minimum element from the unsorted part and puts it at the beginning.";
+		case mergeSort:
+			return "Merge Sort: Repeatedly breaks the list down to smaller lists until there is only 1 element, then merges the lists." 
         default:
             return "";
     }
