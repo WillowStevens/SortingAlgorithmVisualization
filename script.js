@@ -1,10 +1,12 @@
 const container = document.getElementById('container');
+const description = document.getElementById('description');
 let n = 20;
 let array = [];
 let isSorting = false;
 let isPaused = false;
 let timeoutID = null;
 let remainingMoves = [];
+let speed = 150;
 
 document.addEventListener('DOMContentLoaded', (event) => {
     randomizeArray(); // Generate first array and show the bars on program startup
@@ -15,6 +17,11 @@ function updateArraySize(value) {
     n = value;
     document.getElementById('arraysize-value').innerText = value;
     randomizeArray();
+}
+
+function updateSpeed(value) {
+    speed = value;
+    document.getElementById('speed-value').innerText = `${value} ms`;
 }
 
 function randomizeArray() {
@@ -34,6 +41,7 @@ function play(sortFunction) {
     isSorting = true;
     isPaused = false;
     document.getElementById('pauseResumeButton').innerText = 'Pause';
+    description.innerText = getDescription(sortFunction);
     const copy = [...array];
     const moves = sortFunction(copy);
     remainingMoves = moves;
@@ -80,7 +88,7 @@ function animate() {
         [array[i], array[j]] = [array[j], array[i]];
     }
     showBars(move);
-    timeoutID = setTimeout(animate, 150);
+    timeoutID = setTimeout(animate, speed);
 }
 
 function bubbleSort(array) {
@@ -99,6 +107,7 @@ function bubbleSort(array) {
     } while (swapped);
     return moves;
 }
+
 function insertionSort(array) {
     const moves = [];
     for (let i = 1; i < array.length; i++) {
@@ -110,23 +119,25 @@ function insertionSort(array) {
     }
     return moves;
 }
+
 function selectionSort(array) {
-	const moves = [];
-	for(let i = 0; i<array.length;i++){
-		let minIndex = i;
-		for(let j = i+1; j < array.length;j++){
-			moves.push({indices: [minIndex, j], type: "comp"});
-			if(array[j] < array[minIndex]){
-				minIndex = j;
-			}
-		}
-		if(minIndex !== i){
-			[array[i], array[minIndex]] = [array[minIndex], array[i]];
-			moves.push({indices: [minIndex, i], type: "swap"});
-		}
-	}
-	return moves;
+    const moves = [];
+    for (let i = 0; i < array.length; i++) {
+        let minIndex = i;
+        for (let j = i + 1; j < array.length; j++) {
+            moves.push({indices: [minIndex, j], type: "comp"});
+            if (array[j] < array[minIndex]) {
+                minIndex = j;
+            }
+        }
+        if (minIndex !== i) {
+            [array[i], array[minIndex]] = [array[minIndex], array[i]];
+            moves.push({indices: [i, minIndex], type: "swap"});
+        }
+    }
+    return moves;
 }
+
 function showBars(move) {
     container.innerHTML = "";
     for (let i = 0; i < array.length; i++) {
@@ -134,8 +145,21 @@ function showBars(move) {
         bar.style.height = array[i] * 100 + "%";
         bar.classList.add("bar");
         if (move && move.indices.includes(i)) {
-            bar.style.backgroundColor = move.type === "swap" ? "red" : "blue";
+            bar.classList.add(move.type === "swap" ? "swapping" : "comparing");
         }
         container.appendChild(bar);
+    }
+}
+
+function getDescription(sortFunction) {
+    switch (sortFunction) {
+        case bubbleSort:
+            return "Bubble Sort: Repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.";
+        case insertionSort:
+            return "Insertion Sort: Builds the final sorted array one item at a time, inserting elements into their correct position.";
+        case selectionSort:
+            return "Selection Sort: Repeatedly finds the minimum element from the unsorted part and puts it at the beginning.";
+        default:
+            return "";
     }
 }
