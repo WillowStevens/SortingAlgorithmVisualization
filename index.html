@@ -18,17 +18,24 @@
     </div>
     <div>
         <label for="speed">Sorting Speed:</label>
-        <input type="range" id="speed" name="speed" min="50" max="1000" value="150" oninput="updateSpeed(this.value)">
-        <span id="speed-value">150 ms</span>
+        <input type="range" id="speed" name="speed" min="25" max="1000" value="50" oninput="updateSpeed(this.value)">
+        <span id="speed-value">50 ms</span>
     </div>
     <div>
-        <button onclick="randomizeArray()">Randomize List</button>
-        <button onclick="play(bubbleSort)">Bubble Sort</button>
-        <button onclick="play(insertionSort)">Insertion Sort</button>
-        <button onclick="play(selectionSort)">Selection Sort</button>
+        <label for="algorithm">Select Algorithm:</label>
+        <select id="algorithm">
+            <option value="bubbleSort">Bubble Sort</option>
+            <option value="insertionSort">Insertion Sort</option>
+            <option value="selectionSort">Selection Sort</option>
+        </select>
+    </div>
+    <div>
+        <button onclick="randomizeArray()">Randomize Array</button>
+        <button onclick="playSelectedAlgorithm()">Start Sorting</button>
+        <button onclick="step()">Step-by-Step</button>
         <button id="pauseResumeButton" onclick="pauseResume()">Pause</button>
     </div>
-    <div id="description"></div>
+    <div id="algorithm-info"></div>
     <script src="script.js"></script>
 </body>
 </html>
