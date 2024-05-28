@@ -1,15 +1,30 @@
 #container {
-	height: 200px;
-	display: flex;
-	align-items: flex-end;
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
 }
-body{
-	display: flex;
-	align-items: center;
-	flex-direction: column;
+
+body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
-.bar{
-	width : 10px;
-	background-color: black;
-	margin: 1px;
+
+.bar {
+    width: 10px;
+    background-color: black;
+    margin: 1px;
+}
+
+#description {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.comparing {
+    background-color: blue;
+}
+
+.swapping {
+    background-color: red;
 }
