@@ -9,19 +9,47 @@ let remainingMoves = [];
 let speed = 50;
 let sortedIndices = new Set();
 let currentPivotIndex = null; // Add this line to track the current pivot index
+let audioCtx=null;
+let muted=true;
 
 document.addEventListener('DOMContentLoaded', () => {
     randomizeArray();
     updateAlgorithmInfo();
 });
 
+function playNote(freq){
+	if(audioCtx === null){
+		audioCtx=new(
+			AudioContext ||
+			webkitAudioContext ||
+			window.webkitAudioContext
+			)();
+	}
+	const dur=0.1;
+	const osc=audioCtx.createOscillator();
+	osc.frequency.value=freq;
+	if(!muted){
+		osc.start();
+		osc.stop(audioCtx.currentTime+dur);
+		const node = audioCtx.createGain();
+		node.gain.value=0.1;
+		node.gain.linearRampToValueAtTime(
+			0, audioCtx.currentTime+dur
+		);
+		osc.connect(node);
+		node.connect(audioCtx.destination);
+	}
+}
 function updateArraySize(value) {
     stopSorting();
     n = value;
     document.getElementById('arraysize-value').innerText = value;
     randomizeArray();
 }
-
+function updateMute(value) {
+	console.log(value);
+	muted = value;
+}
 function updateSpeed(value) {
     speed = value;
     document.getElementById('speed-value').innerText = `${value} ms`;
@@ -106,10 +134,10 @@ function step() {
         return;
     }
     const move = remainingMoves.shift();
-    console.log("Processing move:", move);
     if (move.indices) {
         const [i, j] = move.indices;
-
+		if(i != null){playNote(300+array[i]*500);};
+		if(j != null){playNote(300+array[j]*500);};
         if (move.type === "swap") {
             [array[i], array[j]] = [array[j], array[i]];
         } else if (move.type === "place") {
