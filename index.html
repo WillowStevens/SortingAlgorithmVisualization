@@ -27,8 +27,8 @@
             <option value="bubbleSort">Bubble Sort</option>
             <option value="insertionSort">Insertion Sort</option>
             <option value="selectionSort">Selection Sort</option>
-		<option value="mergeSort">Merge Sort</option>
-		<option value="quickSort">Quick Sort</option>
+			<option value="mergeSort">Merge Sort</option>
+			<option value="quickSort">Quick Sort</option>
         </select>
     </div>
     <div>
@@ -36,6 +36,8 @@
         <button onclick="playSelectedAlgorithm()">Start Sorting</button>
         <button onclick="step()">Step-by-Step</button>
         <button id="pauseResumeButton" onclick="pauseResume()">Pause</button>
+		<label for="mute">Mute: </label>
+		<input type ="checkbox" id ="mute" name="mute" oninput="updateMute(this.checked)" checked />
     </div>
     <div id="algorithm-info"></div>
     <script src="script.js"></script>
